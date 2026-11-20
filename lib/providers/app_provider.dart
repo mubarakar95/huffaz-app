@@ -22,8 +22,12 @@ import '../services/notification_service.dart';
 /// Central state management — mirrors the DataContext from the Next.js web app.
 /// Uses Hive for offline persistence so data is instantly available on app launch.
 class AppProvider extends ChangeNotifier {
+  /// [authService] is injectable so auth flows can be tested without a backend.
+  AppProvider({AuthService? authService})
+      : _authService = authService ?? AuthService();
+
   // --- Services ---
-  final AuthService _authService = AuthService();
+  final AuthService _authService;
   final StudentService _studentService = StudentService();
   final SettingsService _settingsService = SettingsService();
   final DashboardService _dashboardService = DashboardService();
@@ -625,16 +629,18 @@ class AppProvider extends ChangeNotifier {
       }
       return 'Sign in failed';
     } on AuthException catch (e) {
-      final friendly = _getFriendlyError(e.message);
-      if (friendly != e.message) {
-        return friendly;
-      }
+      // Check sign-in specific messages first: the generic mapper would
+      // otherwise turn "Invalid login credentials" into a session-expired hint.
       final msg = e.message.toLowerCase();
       if (msg.contains('invalid login credentials') || msg.contains('invalid credentials')) {
         return 'Invalid email or password. Please try again.';
       }
       if (msg.contains('email not confirmed')) {
         return 'Your email address is not verified. Please check your inbox.';
+      }
+      final friendly = _getFriendlyError(e.message);
+      if (friendly != e.message) {
+        return friendly;
       }
       return e.message;
     } catch (e) {

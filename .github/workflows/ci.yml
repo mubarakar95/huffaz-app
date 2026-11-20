@@ -22,5 +22,5 @@ jobs:
       - name: Analyze
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
-      - name: Unit tests
-        run: flutter test test/unit
+      - name: Tests (unit, widget, golden)
+        run: flutter test test/unit test/widget test/golden

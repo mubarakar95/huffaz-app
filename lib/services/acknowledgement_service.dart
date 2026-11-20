@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// pending lessons for a given date were genuinely not completed
 /// (not a forgotten log entry).
 class AcknowledgementService {
-  final _supabase = Supabase.instance.client;
+  late final _supabase = Supabase.instance.client;
 
   /// Fetches the Set of student IDs that have been acknowledged
   /// for the given [date] (format: 'YYYY-MM-DD').
